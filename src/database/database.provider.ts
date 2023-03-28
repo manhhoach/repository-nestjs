@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { ormConfig } from 'src/config/ormConfig';
+import { ormConfig } from './../config/ormConfig';
 import { CONSTANTS_REPOSITORY } from './../constants/repository';
 
 export const databaseProvider = {

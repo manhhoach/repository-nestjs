@@ -12,23 +12,29 @@ import {
     UseInterceptors,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { CreateUserDto } from './dto/user.register.dto';
-import { UserDto } from './dto/user.dto';
+import { RegisterUserDto } from './dto/user.register.dto';
+import { LoginUserDto } from './dto/user.login.dto';
+
 import { UserService } from './user.service';
+import { AuthService } from './auth.service';
 import { Serialize } from './../interceptors/validate.interceptor';
 import { CustomResponse } from './../helpers/custom.response';
 
 
 @Controller('users')
 export class UserController {
-    constructor(private userService: UserService) { }
+    constructor(private userService: UserService, private authService: AuthService) { }
 
-    @Serialize(CreateUserDto)
+    @Serialize(RegisterUserDto)
     @Post('/register')
-    async register(@Body() body: CreateUserDto, @Res() res: Response) {
-        let user = await this.userService.create(body);
-        //return CustomResponse.responseSuccess(res, 201, user)
-        return CustomResponse.responseFailure(res, 400, "EMAIL already used")
-
+    async register(@Body() body: RegisterUserDto, @Res() res: Response) {
+        let user = await this.authService.register(body);
+        return CustomResponse.responseSuccess(res, 201, user)
     }
+
+    @Post('/login')
+    async login(@Body() body: LoginUserDto, @Res() res: Response) {
+        await this.authService.login(body)
+    }
+
 }

@@ -1,11 +1,12 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import { CONSTANTS_REPOSITORY } from './../constants/repository';
 
 
 @Injectable()
 export class UserService {
-    constructor(@Inject('USER_REPOSITORY') private userRepository: Repository<User>) { }
+    constructor(@Inject(CONSTANTS_REPOSITORY.USER_REPOSITORY) private userRepository: Repository<User>) { }
 
     findByEmail(email: string): Promise<User> {
         return this.userRepository.findOneBy({ email: email })
