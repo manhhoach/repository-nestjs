@@ -24,8 +24,8 @@ export class CustomResponse {
         let resSuccess = new CustomResponse(res, true, statusCode, data)
         return resSuccess.returnResponse()
     }
-    static responseFailure(res: Response, statusCode: number, error: any) {
-        let resFailure = new CustomResponse(res, false, statusCode, undefined, error)
+    static responseFailure(res: Response, error: any) {
+        let resFailure = new CustomResponse(res, false, error.status, undefined, error.response)
         return resFailure.returnResponse()
     }
 

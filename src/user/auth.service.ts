@@ -4,9 +4,9 @@ import { User } from './user.entity';
 import { CONSTANTS_REPOSITORY } from './../constants/repository';
 import { RegisterUserDto } from './dto/user.register.dto';
 import { LoginUserDto } from './dto/user.login.dto';
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { MESSAGES } from './../constants/messages';
-
+import { CustomError } from './../helpers/custom.error';
 
 @Injectable()
 export class AuthService {
@@ -23,21 +23,23 @@ export class AuthService {
             .select(['user', 'user.password'])
             .getOne();
         if (!user) {
-            throw new NotFoundException(MESSAGES.EMAIL_NOT_FOUND)
-        }  
+            return new CustomError(404, MESSAGES.EMAIL_NOT_FOUND);
+        }
         let comparedPassword = user.comparePassword(data.password);
         if (!comparedPassword) {
-            throw new BadRequestException(MESSAGES.WRONG_PASSWORD)
+            return new CustomError(400, MESSAGES.WRONG_PASSWORD);
         }
-
-
-
-
+        let token = this.generateToken({ id: user.id });
+        return Object.assign(user, { token: token }, { password: undefined });
     }
 
     generateToken(data: any): string {
+        let token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '7d' });
+        return token;
+    }
 
-        return '1'
+    verifyToken(token: string): any{
+        return jwt.verify(token, process.env.SECRET_KEY)
     }
 
 }

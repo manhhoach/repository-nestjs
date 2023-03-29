@@ -16,4 +16,11 @@ export class UserService {
         let user = this.userRepository.create(data);
         return this.userRepository.save(user);
     }
+
+    findById(id: number, requiredPassword = false): Promise<User> {
+        let query = this.userRepository.createQueryBuilder('user').where('user.id = :id', { id: id }).cache(5000)
+        if (requiredPassword)
+            query.addSelect('password');
+        return query.getOne();
+    }
 }
