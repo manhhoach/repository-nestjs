@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException, BadRequestException, } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CONSTANTS_REPOSITORY } from './../constants/repository';
@@ -6,7 +6,6 @@ import { RegisterUserDto } from './dto/user.register.dto';
 import { LoginUserDto } from './dto/user.login.dto';
 import * as jwt from 'jsonwebtoken';
 import { MESSAGES } from './../constants/messages';
-import { CustomError } from './../helpers/custom.error';
 
 @Injectable()
 export class AuthService {
@@ -23,11 +22,11 @@ export class AuthService {
             .select(['user', 'user.password'])
             .getOne();
         if (!user) {
-            return new CustomError(404, MESSAGES.EMAIL_NOT_FOUND);
+            throw new NotFoundException(MESSAGES.EMAIL_NOT_FOUND);
         }
         let comparedPassword = user.comparePassword(data.password);
         if (!comparedPassword) {
-            return new CustomError(400, MESSAGES.WRONG_PASSWORD);
+            throw new BadRequestException(MESSAGES.WRONG_PASSWORD);
         }
         let token = this.generateToken({ id: user.id });
         return Object.assign(user, { token: token }, { password: undefined });
