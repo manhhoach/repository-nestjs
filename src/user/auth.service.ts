@@ -33,7 +33,7 @@ export class AuthService {
     }
 
     generateToken(data: any): string {
-        let token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '7d' });
+        let token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '1d' });
         return token;
     }
 

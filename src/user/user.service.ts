@@ -1,7 +1,8 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CONSTANTS_REPOSITORY } from './../constants/repository';
+import { MESSAGES } from './../constants/messages';
 
 
 @Injectable()
@@ -20,7 +21,24 @@ export class UserService {
     findById(id: number, requiredPassword = false): Promise<User> {
         let query = this.userRepository.createQueryBuilder('user').where('user.id = :id', { id: id }).cache(5000)
         if (requiredPassword)
-            query.addSelect('password');
+            query.addSelect('user.password');
+            
         return query.getOne();
+    }
+
+    save(data: Partial<User>, user: User): Promise<User> {
+        let userSaved = Object.assign(user, data);
+        return userSaved.save();
+    }
+
+
+    changePassword(user: Partial<User>, oldPassword: string, newPassword: string) {
+        let isEqual = user.comparePassword(oldPassword);
+        if (!isEqual) {
+            throw new BadRequestException(MESSAGES.WRONG_PASSWORD);
+        }
+        user.password = newPassword;
+        return user.save();
+
     }
 }

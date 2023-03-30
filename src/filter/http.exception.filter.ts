@@ -1,16 +1,19 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
 import { QueryFailedError } from 'typeorm';
+import {TokenExpiredError, JsonWebTokenError} from 'jsonwebtoken';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
     private static handleResponse(response: Response, exception: HttpException | QueryFailedError | Error) {
-        let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-        let responseBody: any = { message: 'INTERNAL SERVER ERROR' };
-
+        let statusCode = HttpStatus.BAD_REQUEST;
+        let responseBody: any = { message: 'BAD REQUEST' };
+       // console.log(exception.message);
+        
         if (exception instanceof HttpException) {
             statusCode = exception.getStatus();
             responseBody = exception.getResponse();
+            
         }
         else if (exception instanceof QueryFailedError) {
             statusCode = HttpStatus.BAD_REQUEST;
@@ -22,9 +25,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
         else if (exception instanceof Error) {
             responseBody = {
                 statusCode: statusCode,
-                message: exception.stack
+                message: exception.message ? exception.message : exception.stack 
             }
         }
+      
         responseBody.success = false;
         response.status(statusCode).json(responseBody);
     }

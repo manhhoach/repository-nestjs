@@ -4,14 +4,14 @@ import { AuthService } from "./../user/auth.service";
 
 @Injectable()
 export class CurrentUserInterceptor implements NestInterceptor {
-    constructor(private authService: AuthService, private userService: UserService){}
+    constructor(private authService: AuthService, private userService: UserService) { }
 
     async intercept(context: ExecutionContext, handler: CallHandler) {
         const request = context.switchToHttp().getRequest();
         const token = request.headers.authorization.split(' ')[1];
         const decoced = this.authService.verifyToken(token);
-        let user = await this.userService.findById(decoced.id);
-        request.user=user;
+        let user = await this.userService.findById(decoced.id, true);
+        request.user = user;
         return handler.handle();
     }
 }
