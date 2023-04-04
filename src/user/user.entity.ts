@@ -12,13 +12,13 @@ export class User extends BaseEntity {
     @Column({ type: 'varchar', length: 255, unique: true })
     email: string;
 
-    @Column({ nullable: false, select: false })
+    @Column()
     password: string;
 
     @Column({ default: 0 })
     type: number;
 
-    @CreateDateColumn({ select: false })
+    @CreateDateColumn()
     createdAt: Date;
 
     @BeforeUpdate()

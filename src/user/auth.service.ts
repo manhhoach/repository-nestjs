@@ -1,26 +1,25 @@
-import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { User } from './user.entity';
-import { CONSTANTS_REPOSITORY } from './../constants/repository';
 import { RegisterUserDto } from './dto/user.register.dto';
 import { LoginUserDto } from './dto/user.login.dto';
 import * as jwt from 'jsonwebtoken';
 import { MESSAGES } from './../constants/messages';
+import { UserService } from './user.service';
 
 @Injectable()
 export class AuthService {
-    constructor(@Inject(CONSTANTS_REPOSITORY.USER_REPOSITORY) private userRepository: Repository<User>) { }
+    constructor(private userService: UserService) { }
 
-    register(data: RegisterUserDto): Promise<User> {
-        let user = this.userRepository.create(data);
-        return this.userRepository.save(user);
+    async register(data: RegisterUserDto): Promise<User> {
+        let user = await this.userService.findByEmail(data.email);
+        if (user) {
+            throw new BadRequestException(MESSAGES.EMAIL_IN_USE);
+        }
+        return this.userService.createAndSave(data);
     }
 
     async login(data: LoginUserDto) {
-        let user = await this.userRepository.createQueryBuilder('user')
-            .where('user.email = :email', { email: data.email })
-            .select(['user', 'user.password'])
-            .getOne();
+        let user = await this.userService.findByEmail(data.email);
         if (!user) {
             throw new NotFoundException(MESSAGES.EMAIL_NOT_FOUND);
         }
@@ -29,6 +28,7 @@ export class AuthService {
             throw new BadRequestException(MESSAGES.WRONG_PASSWORD);
         }
         let token = this.generateToken({ id: user.id });
+        return Object.assign(user, { token: token });
         return Object.assign(user, { token: token }, { password: undefined });
     }
 
@@ -37,7 +37,7 @@ export class AuthService {
         return token;
     }
 
-    verifyToken(token: string): any{
+    verifyToken(token: string): any {
         return jwt.verify(token, process.env.SECRET_KEY)
     }
 

@@ -10,7 +10,7 @@ export class CurrentUserInterceptor implements NestInterceptor {
         const request = context.switchToHttp().getRequest();
         const token = request.headers.authorization.split(' ')[1];
         const decoced = this.authService.verifyToken(token);
-        let user = await this.userService.findById(decoced.id, true);
+        let user = await this.userService.findById(decoced.id);
         request.user = user;
         return handler.handle();
     }

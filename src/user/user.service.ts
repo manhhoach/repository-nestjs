@@ -13,24 +13,19 @@ export class UserService {
         return this.userRepository.findOneBy({ email: email })
     }
 
-    create(data: Partial<User>): Promise<User> {
-        let user = this.userRepository.create(data);
-        return this.userRepository.save(user);
-    }
-
-    findById(id: number, requiredPassword = false): Promise<User> {
+    findById(id: number): Promise<User> {
         let query = this.userRepository.createQueryBuilder('user').where('user.id = :id', { id: id }).cache(5000)
-        if (requiredPassword)
-            query.addSelect('user.password');
-            
         return query.getOne();
     }
 
-    save(data: Partial<User>, user: User): Promise<User> {
-        let userSaved = Object.assign(user, data);
-        return userSaved.save();
+    save(user: User): Promise<User> {
+        return this.userRepository.save(user);
     }
 
+    createAndSave(data: Partial<User>): Promise<User> {
+        let user = this.userRepository.create(data);
+        return this.userRepository.save(user);
+    }
 
     changePassword(user: Partial<User>, oldPassword: string, newPassword: string) {
         let isEqual = user.comparePassword(oldPassword);

@@ -55,7 +55,8 @@ export class UserController {
     @UseGuards(AuthGuard)
     @UseInterceptors(CurrentUserInterceptor)
     async updateMe(@CurrentUser() user: User, @Body() body: UpdateUserDto, @Res() res: Response) {
-        let userSaved = await this.userService.save(body, user);
+        let userSaved = Object.assign(user, body);
+        userSaved = await this.userService.save(userSaved);
         this.returnResponse(res, HttpStatus.OK, userSaved)
     }
 
