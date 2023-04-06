@@ -84,5 +84,11 @@ describe('auth service', () => {
         expect(user).toBeInstanceOf(User);
     });
 
+    it('return token if login successfully', async () => {
+        await service.register({ email: 'foo@bar.com', password: 'password', name: 'foo' });
+        const user = await service.login({ email: 'foo@bar.com', password: 'password' });
+        expect(user.token).toBeDefined();
+    });
+
     
 });

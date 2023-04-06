@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import {HttpExceptionFilter} from './filter/http.exception.filter'
+import {HttpExceptionFilter} from './exceptions/http.exception.filter'
 
 import * as dotenv from 'dotenv';
 dotenv.config({path: `.env.${process.env.NODE_ENV}`})

@@ -3,6 +3,7 @@ import {MESSAGES} from './../constants/messages';
 
 export class AuthGuard implements CanActivate {
   canActivate(context: ExecutionContext) {
+    console.log('auth guard use');
     const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization?.split(' ')[1];
     if(!token){

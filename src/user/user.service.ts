@@ -34,6 +34,6 @@ export class UserService {
         }
         user.password = newPassword;
         return user.save();
-
     }
+    
 }

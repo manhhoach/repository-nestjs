@@ -29,7 +29,7 @@ export class AuthService {
         }
         let token = this.generateToken({ id: user.id });
         return Object.assign(user, { token: token });
-        return Object.assign(user, { token: token }, { password: undefined });
+       // return Object.assign(user, { token: token }, { password: undefined });
     }
 
     generateToken(data: any): string {
